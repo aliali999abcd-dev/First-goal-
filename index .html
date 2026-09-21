@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f172a"><title>الهدف الأول - جماعي</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6fa;color:#111827;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}
+main{max-width:760px;margin:auto;padding:14px 12px 50px}.hero{background:#0f172a;color:#fff;padding:20px;border-radius:22px;margin-bottom:12px}
+h1{margin:0;font-size:27px}.hero p{color:#cbd5e1;margin:7px 0 0}.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:15px;margin:11px 0}
+h2{font-size:18px;margin:0 0 11px}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field{margin:8px 0}
+label{display:block;color:#6b7280;font-size:13px;margin-bottom:5px}input,select,textarea,button{font:inherit}input,select,textarea{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:12px;background:#fff;font-size:16px}
+button{border:0;border-radius:12px;padding:12px 14px;font-weight:750;cursor:pointer}.primary{background:#166534;color:white}.secondary{background:#e5e7eb}.danger{background:#fee2e2;color:#991b1b}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.hidden{display:none!important}.room{font-size:28px;font-weight:900;letter-spacing:3px}.muted{color:#6b7280;font-size:14px}
+.person,.pick{padding:10px;border-bottom:1px solid #e5e7eb}.person{display:flex;justify-content:space-between;align-items:center;gap:8px}.pick:last-child,.person:last-child{border-bottom:0}
+.badge{background:#dcfce7;color:#14532d;border-radius:999px;padding:4px 8px;font-size:12px}.notice{padding:11px;border-radius:12px;background:#eff6ff;color:#1e40af;margin-top:9px}
+.success{padding:11px;border-radius:12px;background:#ecfdf5;color:#065f46;margin-top:9px}
+table{width:100%;border-collapse:collapse}th,td{text-align:right;padding:10px 7px;border-bottom:1px solid #e5e7eb}th{font-size:12px;color:#6b7280}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tab.active{background:#166534;color:#fff}.tab{background:#e5e7eb}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<section class="hero"><h1>⚽ الهدف الأول</h1><p>غرفة جماعية للتوقعات والنقاط المباشرة.</p></section>
+
+<section id="entry" class="card">
+<div class="tabs"><button id="hostTab" class="tab active">أنا المدير</button><button id="playerTab" class="tab">أنا مشارك</button></div>
+<div id="hostEntry">
+<h2 style="margin-top:15px">إنشاء غرفة جديدة</h2>
+<label>اسم المدير</label><input id="hostName" placeholder="مثلاً: بارق">
+<label style="margin-top:8px">رمز المدير</label><input id="hostPin" type="password" inputmode="numeric" maxlength="4" placeholder="أدخل رمز المدير">
+<button id="createRoom" class="primary" style="width:100%;margin-top:10px">إنشاء الغرفة</button>
+</div>
+<div id="playerEntry" class="hidden">
+<h2 style="margin-top:15px">دخول غرفة</h2>
+<div class="row"><div><label>كود الغرفة</label><input id="joinCode" maxlength="6" placeholder="مثلاً 483921" inputmode="numeric"></div><div><label>اسمك</label><input id="joinName" placeholder="اكتب اسمك"></div></div>
+<button id="joinRoom" class="primary" style="width:100%;margin-top:10px">دخول</button>
+</div><div id="entryMsg" class="muted" style="margin-top:8px"></div>
+</section>
+
+<section id="game" class="hidden">
+<div class="card"><div class="row"><div><div class="muted">كود الغرفة</div><div id="roomCode" class="room">------</div></div><div><div class="muted">أنت داخل باسم</div><b id="myName">—</b><div id="roleLabel" class="badge" style="display:inline-block;margin-top:5px"></div></div></div><div id="syncMsg" class="muted" style="margin-top:8px">متصل...</div></div>
+
+<div id="hostPanel" class="card hidden"><h2>🏟️ تحكم المدير</h2>
+<div class="row"><div><label>الفريق الأول</label><input id="teamA"></div><div><label>الفريق الثاني</label><input id="teamB"></div></div>
+<label>لاعبي الفريقين (افصل بفاصلة)</label><textarea id="footballers" rows="3" placeholder="مبابي، فينيسيوس، صلاح..."></textarea>
+<div class="actions"><button id="openPicks" class="primary">فتح التوقعات</button><button id="closePicks" class="secondary">قفل التوقعات</button></div>
+<div style="margin-top:12px"><label>مسجل الهدف الأول</label><select id="scorer"><option value="">—</option></select></div>
+<div class="actions"><button id="award" class="primary">اعتماد الهدف + النقاط</button><button id="newMatch" class="secondary">مباراة جديدة</button><button id="reset" class="danger">تصفير النقاط</button></div>
+<div id="hostMsg" class="muted" style="margin-top:8px"></div></div>
+
+<div class="card"><h2>🎯 المباراة والتوقع</h2><div id="matchTitle" class="notice">بانتظار المدير لإعداد المباراة.</div>
+<div id="pickArea" style="margin-top:10px"><div class="muted">لم تفتح التوقعات بعد.</div></div>
+<div id="resultMsg" class="muted" style="margin-top:9px"></div></div>
+
+<div class="card"><h2>👥 المشاركون</h2><div id="people"></div></div>
+<div class="card"><h2>🏆 الترتيب العام</h2><div style="overflow:auto"><table><thead><tr><th>#</th><th>الاسم</th><th>النقاط</th><th>التوقع</th></tr></thead><tbody id="board"></tbody></table></div></div>
+</section>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyBfUqotyJER-Lzp6d9xvjs2SF67MKtkows",
+ authDomain:"bareq-c97ff.firebaseapp.com",
+ databaseURL:"https://bareq-c97ff-default-rtdb.firebaseio.com",
+ projectId:"bareq-c97ff",
+ storageBucket:"bareq-c97ff.firebasestorage.app",
+ messagingSenderId:"582625320416",
+ appId:"1:582625320416:web:b6d1272ccbebd85a9bdf85"
+};
+const app=initializeApp(firebaseConfig),db=getDatabase(app);
+const $=x=>document.getElementById(x), esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let room="",me="",isHost=false,roomData=null,unsub=null;
+const keyName=n=>n.trim().toLowerCase().replace(/[.#$[\]/]/g,"_").slice(0,40);
+function switchTab(host){$("hostEntry").classList.toggle("hidden",!host);$("playerEntry").classList.toggle("hidden",host);$("hostTab").classList.toggle("active",host);$("playerTab").classList.toggle("active",!host)}
+$("hostTab").onclick=()=>switchTab(true);$("playerTab").onclick=()=>switchTab(false);
+function code(){return String(Math.floor(100000+Math.random()*900000))}
+async function freshCode(){for(let i=0;i<8;i++){let c=code(),s=await get(ref(db,"rooms/"+c));if(!s.exists())return c}throw Error("تعذر إنشاء كود")}
+$("createRoom").onclick=async()=>{try{me=$("hostName").value.trim();if(!me)return $("entryMsg").textContent="اكتب اسم المدير.";if($("hostPin").value.trim()!=="1234")return $("entryMsg").textContent="رمز المدير غير صحيح.";room=await freshCode();isHost=true;await set(ref(db,"rooms/"+room),{host:keyName(me),status:"waiting",matchNo:1,teamA:"",teamB:"",players:[],result:"",members:{[keyName(me)]:{name:me,score:0,pick:""}}});enter()}catch(e){$("entryMsg").textContent="تعذر إنشاء الغرفة. تأكد من قواعد Realtime Database والإنترنت."}};
+$("joinRoom").onclick=async()=>{try{room=$("joinCode").value.trim();me=$("joinName").value.trim();if(!room||!me)return $("entryMsg").textContent="اكتب الكود واسمك.";let s=await get(ref(db,"rooms/"+room));if(!s.exists())return $("entryMsg").textContent="الغرفة غير موجودة.";isHost=false;let k=keyName(me),m=s.val().members?.[k];await update(ref(db,"rooms/"+room+"/members/"+k),{name:me,score:m?.score||0,pick:""});enter()}catch(e){$("entryMsg").textContent="تعذر الدخول. تحقق من الاتصال أو قواعد قاعدة البيانات."}};
+function enter(){$("entry").classList.add("hidden");$("game").classList.remove("hidden");$("roomCode").textContent=room;$("myName").textContent=me;$("roleLabel").textContent=isHost?"مدير":"مشارك";$("hostPanel").classList.toggle("hidden",!isHost);listen()}
+function listen(){if(unsub)unsub();unsub=onValue(ref(db,"rooms/"+room),s=>{if(!s.exists())return;roomData=s.val();render();$("syncMsg").textContent="● متصل بالغرفة مباشرة";},()=>{$("syncMsg").textContent="تعذر المزامنة — راجع Rules"});}
+function render(){let d=roomData||{},members=d.members||{},arr=Object.entries(members).map(([k,v])=>({k,...v}));$("matchTitle").textContent=d.teamA&&d.teamB?`${d.teamA} × ${d.teamB} — المباراة ${d.matchNo||1}`:"بانتظار المدير لإعداد المباراة.";
+$("people").innerHTML=arr.length?arr.map(x=>`<div class="person"><b>${esc(x.name)}</b><span class="badge">${x.score||0} نقطة</span></div>`).join(""):'<div class="muted">لا يوجد مشاركون</div>';
+arr.sort((a,b)=>(b.score||0)-(a.score||0));$("board").innerHTML=arr.map((x,i)=>`<tr><td><b>${i+1}</b></td><td>${esc(x.name)}</td><td><b>${x.score||0}</b></td><td>${d.status==="scored"?esc(x.pick||"—"):(x.pick?"✓ تم":"—")}</td></tr>`).join("");
+let mine=members[keyName(me)]||{},players=Array.isArray(d.players)?d.players:Object.values(d.players||{});
+if(d.status==="open"){$("pickArea").innerHTML=`<label>اختَر مسجل الهدف الأول</label><select id="myPick"><option value="">— اختر —</option>${players.map(p=>`<option ${mine.pick===p?"selected":""} value="${esc(p)}">${esc(p)}</option>`).join("")}</select><button id="savePick" class="primary" style="width:100%;margin-top:8px">حفظ توقعي</button>`;$("savePick").onclick=async()=>{let p=$("myPick").value;if(!p)return;await update(ref(db,`rooms/${room}/members/${keyName(me)}`),{pick:p});$("resultMsg").textContent="تم حفظ توقعك.";};}
+else if(d.status==="closed")$("pickArea").innerHTML=`<div class="notice">التوقعات مقفلة. توقعك: <b>${esc(mine.pick||"لم تسجل")}</b></div>`;
+else if(d.status==="scored")$("pickArea").innerHTML=`<div class="success">النتيجة: ${esc(d.result||"—")} — توقعك: <b>${esc(mine.pick||"—")}</b></div>`;
+else $("pickArea").innerHTML='<div class="muted">لم تفتح التوقعات بعد.</div>';
+$("resultMsg").textContent=d.message||"";
+if(isHost){$("teamA").value=d.teamA||"";$("teamB").value=d.teamB||"";$("footballers").value=players.join("، ");$("scorer").innerHTML='<option value="">— اختر المسجل —</option>'+players.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("")+'<option value="NO_GOAL">لا يوجد هدف / 0-0</option>';}
+}
+const parse=s=>[...new Set(s.split(/[،,\n]+/).map(x=>x.trim()).filter(Boolean))];
+$("openPicks").onclick=async()=>{let a=$("teamA").value.trim(),b=$("teamB").value.trim(),ps=parse($("footballers").value);if(!a||!b||!ps.length)return $("hostMsg").textContent="أدخل الفريقين واللاعبين.";let members=roomData?.members||{},changes={};Object.keys(members).forEach(k=>changes[`members/${k}/pick`]="");await update(ref(db,"rooms/"+room),{teamA:a,teamB:b,players:ps,status:"open",result:"",message:"",...changes});$("hostMsg").textContent="تم فتح التوقعات."};
+$("closePicks").onclick=()=>update(ref(db,"rooms/"+room),{status:"closed",message:"تم قفل التوقعات."});
+$("award").onclick=async()=>{let scorer=$("scorer").value;if(!scorer)return $("hostMsg").textContent="حدد المسجل.";let d=(await get(ref(db,"rooms/"+room))).val();if(d.status==="scored")return $("hostMsg").textContent="تم احتساب هذه المباراة مسبقاً.";let updates={status:"scored",result:scorer==="NO_GOAL"?"لا يوجد هدف":scorer,message:"تم اعتماد النتيجة."};if(scorer!=="NO_GOAL"){for(const [k,m] of Object.entries(d.members||{})){if(m.pick===scorer)updates[`members/${k}/score`]=(m.score||0)+1;}}await update(ref(db,"rooms/"+room),updates);$("hostMsg").textContent="تم احتساب النقاط."};
+$("newMatch").onclick=async()=>{let d=(await get(ref(db,"rooms/"+room))).val(),u={status:"waiting",teamA:"",teamB:"",players:[],result:"",message:"",matchNo:(d.matchNo||1)+1};Object.keys(d.members||{}).forEach(k=>u[`members/${k}/pick`]="");await update(ref(db,"rooms/"+room),u)};
+$("reset").onclick=async()=>{if(!confirm("تصفير نقاط الجميع؟"))return;let d=(await get(ref(db,"rooms/"+room))).val(),u={matchNo:1,status:"waiting",teamA:"",teamB:"",players:[],result:"",message:""};Object.keys(d.members||{}).forEach(k=>{u[`members/${k}/score`]=0;u[`members/${k}/pick`]=""});await update(ref(db,"rooms/"+room),u)};
+</script></body></html>
